@@ -6,8 +6,15 @@ export default {
   ],
   theme: {
     extend: {
+
       fontFamily: {
         inter: ['Inter', 'sans-serif'],
+      },
+      colors: {
+        primary: '#1967d2',
+        secondary: '#f97316',
+        light: '#f1f5f9',
+        dark: '#0f172a',
       },
     },
   },

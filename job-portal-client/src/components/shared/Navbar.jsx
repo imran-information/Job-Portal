@@ -1,57 +1,95 @@
-import React, { useContext } from 'react';
-import { Link } from 'react-router';
+import React, { useContext, useEffect, useState, useCallback } from 'react';
+import { Link, NavLink } from 'react-router-dom';
 import AuthContext from '../../context/AuthContext/AuthContext';
-import logo from '../../assets/logo.png'
+import logo from '../../assets/logo.png';
+
 const Navbar = () => {
-    const { user, signOutUser } = useContext(AuthContext)
+    const { user, signOutUser } = useContext(AuthContext);
+    const [scrolled, setScrolled] = useState(false);
 
-    const links = <>
-        <li><Link to="/">Home</Link></li>
-        <li><Link to="/find-jobs">Find Jobs</Link></li>
-        <li><Link to="/employers">Employers</Link></li>
-        <li><Link to="/candidates">Candidates</Link></li>
-        <li><Link to="/blogs">Blogs</Link></li>
-        <li><Link to="/jobs">Blogs</Link></li>
+    // Memoized scroll handler
+    const handleScroll = useCallback(() => {
+        setScrolled(window.scrollY > 10);
+    }, []);
 
-        {!user && <li><Link to="/register">Register</Link></li>}
-    </>
+    useEffect(() => {
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [handleScroll]);
+
+    // Memoized navigation links
+    const renderLinks = useCallback(() => {
+        const linkClasses = `hover:bg-primary hover:text-white transition-colors duration-200 px-4 py-2 rounded-md ${scrolled ? 'text-gray-800' : 'text-white'}`;
+
+        return (
+            <>
+                <li><NavLink className={({ isActive }) => `${linkClasses} ${isActive ? 'bg-primary text-white' : ''}`} to="/">Home</NavLink></li>
+                <li><NavLink className={({ isActive }) => `${linkClasses} ${isActive ? 'bg-primary text-white' : ''}`} to="/find-jobs">Find Jobs</NavLink></li>
+                <li><NavLink className={({ isActive }) => `${linkClasses} ${isActive ? 'bg-primary text-white' : ''}`} to="/employers">Employers</NavLink></li>
+                <li><NavLink className={({ isActive }) => `${linkClasses} ${isActive ? 'bg-primary text-white' : ''}`} to="/candidates">Candidates</NavLink></li>
+                <li><NavLink className={({ isActive }) => `${linkClasses} ${isActive ? 'bg-primary text-white' : ''}`} to="/blogs">Blogs</NavLink></li>
+                <li><NavLink className={({ isActive }) => `${linkClasses} ${isActive ? 'bg-primary text-white' : ''}`} to="/jobs">Jobs</NavLink></li>
+                <li><Link className={`${linkClasses} bg-primary/10 hover:bg-primary hover:text-white ml-2`} to="/upload-cv">Upload CV</Link></li>
+                {!user && <li><NavLink className={({ isActive }) => `${linkClasses} ${isActive ? 'bg-primary text-white' : ''}`} to="/register">Register</NavLink></li>}
+            </>
+        );
+    }, [scrolled, user]);
+
     return (
-        <div className="navbar bg-[#f3f5fb]  shadow-sm sticky top-0    ">
-            <div className="container mx-auto">
-                <div className="navbar-start">
-                    <div className="dropdown">
-                        <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" /> </svg>
+        <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 shadow-md py-2' : 'bg-transparent py-4'}`}>
+            <div className="container mx-auto px-4">
+                <div className="flex justify-between items-center">
+                    {/* Logo/Mobile Menu */}
+                    <div className="flex items-center">
+                        <div className="dropdown lg:hidden">
+                            <label tabIndex={0} className="btn btn-ghost">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                                </svg>
+                            </label>
+                            <ul tabIndex={0} className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-white rounded-box w-52">
+                                {renderLinks()}
+                            </ul>
                         </div>
-                        <ul
-                            tabIndex={0}
-                            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-                            {links}
-                        </ul>
+                        <Link to="/" className="flex items-center">
+                            <img className="w-12 h-12 object-contain" src={logo} alt="Job Portal Logo" />
+                            <span className={`ml-2 text-xl font-bold ${scrolled ? 'text-gray-900' : 'text-white'}`}>JobPortal</span>
+                        </Link>
                     </div>
-                    <Link className='flex items-center text-3xl font-semibold' to='/'>
-                        <img className='w-20' src={logo} alt="" />
-                        Job Portal</Link>
-                </div>
 
-                <div className="navbar-end">
-                    <div className="navbar-center hidden lg:flex">
-                        <ul className="menu menu-horizontal justify-end px-1">
-                            {links}
+                    {/* Desktop Navigation */}
+                    <div className="hidden lg:flex items-center space-x-1">
+                        <ul className="menu menu-horizontal px-1 space-x-1">
+                            {renderLinks()}
                         </ul>
                     </div>
-                    {
-                        user
-                            ? <button onClick={signOutUser} className="btn">
-                                Sing Out
-                            </button>
-                            : <Link to="/login" className="btn">
+
+                    {/* Auth Buttons */}
+                    <div className="flex items-center">
+                        {user ? (
+                            <div className="dropdown dropdown-end">
+                                <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
+                                    <div className="w-10 rounded-full bg-primary text-white flex items-center justify-center">
+                                        {user.email.charAt(0).toUpperCase()}
+                                    </div>
+                                </label>
+                                <ul tabIndex={0} className="mt-3 p-2 shadow menu menu-compact dropdown-content bg-white rounded-box w-52">
+                                    <li><Link to="/dashboard">Dashboard</Link></li>
+                                    <li><button onClick={signOutUser}>Sign Out</button></li>
+                                </ul>
+                            </div>
+                        ) : (
+                            <Link
+                                to="/login"
+                                className={`btn ${scrolled ? 'btn-primary' : 'btn-outline btn-primary text-white border-white hover:bg-white hover:text-primary'}`}
+                            >
                                 Login
                             </Link>
-                    }
+                        )}
+                    </div>
                 </div>
-            </div >
-        </div >
+            </div>
+        </nav>
     );
 };
 
