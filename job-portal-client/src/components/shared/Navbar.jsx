@@ -1,18 +1,22 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router';
 import AuthContext from '../../context/AuthContext/AuthContext';
-
+import logo from '../../assets/logo.png'
 const Navbar = () => {
     const { user, signOutUser } = useContext(AuthContext)
 
     const links = <>
         <li><Link to="/">Home</Link></li>
-        <li><Link to="/jobs">Jobs</Link></li>
+        <li><Link to="/find-jobs">Find Jobs</Link></li>
+        <li><Link to="/employers">Employers</Link></li>
+        <li><Link to="/candidates">Candidates</Link></li>
+        <li><Link to="/blogs">Blogs</Link></li>
+        <li><Link to="/jobs">Blogs</Link></li>
 
         {!user && <li><Link to="/register">Register</Link></li>}
     </>
     return (
-        <div className="navbar bg-black shadow-sm sticky top-0  text-white  ">
+        <div className="navbar bg-[#f3f5fb]  shadow-sm sticky top-0    ">
             <div className="container mx-auto">
                 <div className="navbar-start">
                     <div className="dropdown">
@@ -25,7 +29,9 @@ const Navbar = () => {
                             {links}
                         </ul>
                     </div>
-                    <Link to='/'>LOGO</Link>
+                    <Link className='flex items-center text-3xl font-semibold' to='/'>
+                        <img className='w-20' src={logo} alt="" />
+                        Job Portal</Link>
                 </div>
 
                 <div className="navbar-end">
