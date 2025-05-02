@@ -1,0 +1,22 @@
+import { Route, Routes } from "react-router";
+import Main from "../layouts/Main";
+import Home from "../pages/Home";
+import Login from "../pages/login";
+import Register from "../pages/Register";
+import Jobs from "../pages/Jobs";
+
+
+const Router = () => {
+    return (
+        <Routes>
+            <Route element={<Main />} >
+                <Route index element={<Home />} />
+                <Route path="login" element={<Login />} />
+                <Route path="register" element={<Register />} />
+                <Route path="jobs" element={<Jobs />} />
+            </Route>
+        </Routes>
+    );
+};
+
+export default Router;
